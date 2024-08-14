@@ -100,11 +100,17 @@ const ELA = ({ data, closeTest, addTest }) => {
 
   const updatedQuestion = { ...currentQuestion, section: selectedSection };
 
-  console.log("Request payload:", updatedQuestion);  // Log payload
+  console.log("Request payload:", updatedQuestion);
 
   try {
-    const response = await axios.post(`https://csuite-production.up.railway.app/api/question/66bc5fbb7b56debaadf7377e/sections/${selectedSection}/questions`, updatedQuestion);
-    console.log("Response:", response);  // Log response
+    const response = await axios.post(
+      `https://csuite-production.up.railway.app/api/question/66bc5fbb7b56debaadf7377e/sections/${selectedSection}/questions`,
+      updatedQuestion,
+      {
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
+    console.log("Response:", response);
     if (response.status === 201 || response.status === 200) {
       addTest(currentTest);
       closeTest();
@@ -115,6 +121,7 @@ const ELA = ({ data, closeTest, addTest }) => {
     console.error("Error saving test:", error.message);
   }
 };
+
 
   return (
     <div className="ela-test-page">
