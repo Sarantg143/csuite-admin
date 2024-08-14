@@ -55,10 +55,6 @@ const ELA = ({ data, closeTest, addTest }) => {
     }
   };
 
-  const checkquestionMatch = (index) => {
-    return currentTest.indexOf(currentQuestion) === index ? "#8949ff" : "transparent";
-  };
-
   const questionValidation = () => {
     return (
       currentQuestion?.question.length > 5 &&
@@ -241,6 +237,9 @@ const ELA = ({ data, closeTest, addTest }) => {
                 </div>
               )}
             </div>
+            {!currentQuestion.section && (
+              <p className="warning-text">Section is required!</p>
+            )}
           </div>
           <div className="ela-dropdown-cnt">
             <p>Select Difficulty</p>
@@ -269,6 +268,9 @@ const ELA = ({ data, closeTest, addTest }) => {
                 </div>
               )}
             </div>
+            {!currentQuestion.difficulty && (
+              <p className="warning-text">Difficulty is required!</p>
+            )}
           </div>
           <div className="ela-dropdown-cnt">
             <p>Select Duration</p>
@@ -297,6 +299,9 @@ const ELA = ({ data, closeTest, addTest }) => {
                 </div>
               )}
             </div>
+            {!currentQuestion.duration && (
+              <p className="warning-text">Duration is required!</p>
+            )}
           </div>
         </div>
         <div className="ela-description-cnt">
