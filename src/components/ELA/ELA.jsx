@@ -38,19 +38,22 @@ const ELA = ({ data, closeTest, addTest }) => {
   };
 
  const handleNext = () => {
-  // Add validation and ensure question is added to currentTest
   console.log("Current Question before adding:", currentQuestion);
-  
-  setCurrentTest((prev) => {
-    const updatedTest = [...prev, currentQuestion];
-    console.log("Updated Test State:", updatedTest);
-    return updatedTest;
-  });
 
-  // Reset currentQuestion for the next question
-  setCurrentQuestion(initialState);
+  // Validate the question before adding
+  if (questionValidation()) {
+    setCurrentTest((prev) => {
+      const updatedTest = [...prev, currentQuestion];
+      console.log("Updated Test after adding question:", updatedTest);
+      return updatedTest;
+    });
+
+    // Reset the question for the next one
+    setCurrentQuestion(initialState);
+  } else {
+    console.warn("Current question is not valid.");
+  }
 };
-
 
 
   const checkQuestionMatch = (index) => {
