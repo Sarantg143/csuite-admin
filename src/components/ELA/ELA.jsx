@@ -3,7 +3,9 @@ import axios from "axios";
 
 const ELA = ({ data, closeTest, addTest }) => {
   const initialState = {
-    section: null,
+    section: "",
+    difficulty: "",
+    duration: "",
     question: "",
     answer: null,
     choices: [],
@@ -15,9 +17,9 @@ const ELA = ({ data, closeTest, addTest }) => {
   const [dropDown, setDropDown] = useState(false);
   const [difficultyDropDown, setDifficultyDropDown] = useState(false);
   const [sectionDropDown, setSectionDropDown] = useState(false);
+  const [durationDropDown, setDurationDropDown] = useState(false);
 
-  // Define checkquestionMatch function
-  const checkquestionMatch = (index) => {
+  const checkquestionMatchStyle = (index) => {
     return currentTest.indexOf(currentQuestion) === index ? "#8949ff" : "transparent";
   };
 
@@ -37,23 +39,23 @@ const ELA = ({ data, closeTest, addTest }) => {
 
   const handleNext = () => {
     const existingIndex = currentTest?.indexOf(currentQuestion);
-    const updatestart = [...currentTest];
+    const updatedTest = [...currentTest];
     if (existingIndex === -1) {
-      updatestart?.push(currentQuestion);
-      setCurrentTest(updatestart);
+      updatedTest.push(currentQuestion);
+      setCurrentTest(updatedTest);
       setCurrentQuestion(initialState);
     } else if (existingIndex + 1 === currentTest.length) {
-      updatestart[existingIndex] = currentQuestion;
-      setCurrentTest(updatestart);
+      updatedTest[existingIndex] = currentQuestion;
+      setCurrentTest(updatedTest);
       setCurrentQuestion(initialState);
     } else {
-      updatestart[existingIndex] = currentQuestion;
-      setCurrentTest(updatestart);
-      setCurrentQuestion(currentTest[existingIndex + 1]);
+      updatedTest[existingIndex] = currentQuestion;
+      setCurrentTest(updatedTest);
+      setCurrentQuestion(updatedTest[existingIndex + 1]);
     }
   };
 
-  const checkquestionMatchStyle = (index) => {
+  const checkquestionMatch = (index) => {
     return currentTest.indexOf(currentQuestion) === index ? "#8949ff" : "transparent";
   };
 
@@ -62,7 +64,9 @@ const ELA = ({ data, closeTest, addTest }) => {
       currentQuestion?.question.length > 5 &&
       currentQuestion?.answer &&
       currentQuestion?.choices?.length === 4 &&
-      currentQuestion?.section
+      currentQuestion?.section &&
+      currentQuestion?.difficulty &&
+      currentQuestion?.duration
     );
   };
 
@@ -238,27 +242,83 @@ const ELA = ({ data, closeTest, addTest }) => {
               )}
             </div>
           </div>
-          <div className="ela-description-cnt">
-            <p>Tags</p>
-            <input
-              type="text"
-              name=""
-              id=""
-              className="ela-tags description-input "
-            />
+          <div className="ela-dropdown-cnt">
+            <p>Select Difficulty</p>
+            <div className="ela-dropdown-box" onClick={() => setDifficultyDropDown(!difficultyDropDown)}>
+              <p>{currentQuestion.difficulty || "Select Difficulty"}</p>
+              {difficultyDropDown && (
+                <div className="ela-dropdown-options">
+                  <div
+                    className="ela-dropdown-element"
+                    onClick={() => setCurrentQuestion({ ...currentQuestion, difficulty: "Easy" })}
+                  >
+                    <p>Easy</p>
+                  </div>
+                  <div
+                    className="ela-dropdown-element"
+                    onClick={() => setCurrentQuestion({ ...currentQuestion, difficulty: "Medium" })}
+                  >
+                    <p>Medium</p>
+                  </div>
+                  <div
+                    className="ela-dropdown-element"
+                    onClick={() => setCurrentQuestion({ ...currentQuestion, difficulty: "Hard" })}
+                  >
+                    <p>Hard</p>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
+          <div className="ela-dropdown-cnt">
+            <p>Select Duration</p>
+            <div className="ela-dropdown-box" onClick={() => setDurationDropDown(!durationDropDown)}>
+              <p>{currentQuestion.duration || "Select Duration"}</p>
+              {durationDropDown && (
+                <div className="ela-dropdown-options">
+                  <div
+                    className="ela-dropdown-element"
+                    onClick={() => setCurrentQuestion({ ...currentQuestion, duration: "10 minutes" })}
+                  >
+                    <p>10 minutes</p>
+                  </div>
+                  <div
+                    className="ela-dropdown-element"
+                    onClick={() => setCurrentQuestion({ ...currentQuestion, duration: "20 minutes" })}
+                  >
+                    <p>20 minutes</p>
+                  </div>
+                  <div
+                    className="ela-dropdown-element"
+                    onClick={() => setCurrentQuestion({ ...currentQuestion, duration: "30 minutes" })}
+                  >
+                    <p>30 minutes</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="ela-description-cnt">
+          <p>Tags</p>
+          <input
+            type="text"
+            name=""
+            id=""
+            className="ela-tags description-input"
+          />
         </div>
       </div>
       <div className="action-btns-cnt">
         <div
           className="course-delete-btn cancel-test-btn"
-          onClick={closeTest}
+          onClick={() => closeTest()}
         >
           Cancel
         </div>
         <div
           className="course-delete-btn save-next"
-          onClick={handleNext}
+          onClick={() => handleNext()}
           style={{
             background: !questionValidation() && "gray",
             pointerEvents: !questionValidation() && "none",
@@ -266,7 +326,7 @@ const ELA = ({ data, closeTest, addTest }) => {
         >
           Save and Next
         </div>
-        <div className="add-new-lesson-btn" onClick={handleAddTest}>
+        <div className="add-new-lesson-btn" onClick={() => handleAddTest()}>
           Upload
         </div>
       </div>
