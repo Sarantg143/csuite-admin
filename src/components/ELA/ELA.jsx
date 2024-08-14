@@ -37,23 +37,27 @@ const ELA = ({ data, closeTest, addTest }) => {
     setCurrentQuestion({ ...currentQuestion, choices: newChoices });
   };
 
-  const handleNext = () => {
-    const existingIndex = currentTest?.indexOf(currentQuestion);
-    const updatedTest = [...currentTest];
-    if (existingIndex === -1) {
-      updatedTest?.push(currentQuestion);
-      setCurrentTest(updatedTest);
-      setCurrentQuestion(initialState);
-    } else if (existingIndex + 1 === currentTest.length) {
-      updatedTest[existingIndex] = currentQuestion;
-      setCurrentTest(updatedTest);
-      setCurrentQuestion(initialState);
-    } else {
-      updatedTest[existingIndex] = currentQuestion;
-      setCurrentTest(updatedTest);
-      setCurrentQuestion(updatedTest[existingIndex + 1]);
-    }
-  };
+ const handleNext = () => {
+  if (!questionValidation()) {
+    console.error("Question validation failed.");
+    return;
+  }
+
+  const updatedTest = [...currentTest];
+  const currentIndex = currentTest.findIndex(q => q.questionNumber === currentQuestion.questionNumber);
+
+  if (currentIndex === -1) {
+    // Add new question if it's not in the currentTest
+    updatedTest.push({ ...currentQuestion, questionNumber: updatedTest.length + 1 });
+  } else {
+    // Update existing question
+    updatedTest[currentIndex] = { ...currentQuestion, questionNumber: currentIndex + 1 };
+  }
+
+  setCurrentTest(updatedTest);
+  setCurrentQuestion(initialState);
+};
+
 
   const checkQuestionMatch = (index) => {
     if (currentTest?.indexOf(currentQuestion) === index) return "#8949ff";
@@ -64,10 +68,7 @@ const ELA = ({ data, closeTest, addTest }) => {
     return (
       currentQuestion?.question.length > 5 &&
       currentQuestion?.answer &&
-      currentQuestion?.choices?.length === 4 &&
-      currentQuestion?.section &&
-      currentQuestion?.description &&
-      currentQuestion?.difficulty
+      currentQuestion?.choices?.length === 4
     );
   };
 
@@ -99,33 +100,33 @@ const handleAddTest = async () => {
     return;
   }
 
-  // Log currentTest state
   console.log("Current Test State:", currentTest);
 
-  // Check if currentTest is not empty
   if (currentTest.length === 0) {
     console.error("No questions to add.");
     return;
   }
 
-  // Construct the payload with necessary fields
-  const payload = currentTest.map((q) => ({
-    question: q.question || "",
-    options: q.choices || [],
-    answer: q.answer?.value || "",
-    description: q.description || "",
-    difficulty: q.difficulty || "Easy",
-    tags: q.tags || [],
-  }));
+  const payload = {
+    questions: currentTest.map((q) => ({
+      question: q.question || "",
+      options: q.choices || [],
+      answer: q.answer?.value || "",
+      description: q.description || "",
+      difficulty: q.difficulty || "Easy",
+      tags: q.tags || [],
+    })),
+  };
 
-  console.log("Request payload:", { questions: payload });  // Log payload for debugging
+  console.log("Request payload:", payload);
 
   try {
     const response = await axios.post(
       `https://csuite-production.up.railway.app/api/question/66bc5fbb7b56debaadf7377e/sections/${selectedSection}/questions`,
-      { questions: payload }  // Wrap the payload in an object with a 'questions' key
+      payload
     );
-    console.log("Response:", response);  // Log response for debugging
+    console.log("Response:", response);
+
     if (response.status === 201 || response.status === 200) {
       addTest(currentTest);
       closeTest();
@@ -136,6 +137,7 @@ const handleAddTest = async () => {
     console.error("Error saving test:", error.message);
   }
 };
+
 
 //  const handleAddTest = async () => {
 //    if (!selectedSection) {
