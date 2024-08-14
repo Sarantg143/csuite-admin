@@ -20,7 +20,6 @@ const ELA = ({ closeTest, addTest }) => {
   const [difficultyDropDown, setDifficultyDropDown] = useState(false);
 
   useEffect(() => {
-    // Fetch existing questions from the API
     axios.get("https://csuite-production.up.railway.app/api/question/")
       .then(response => {
         setCurrentTest(response.data);
@@ -75,8 +74,12 @@ const ELA = ({ closeTest, addTest }) => {
       sections: currentTest,
     })
       .then(response => {
-        addTest(currentTest);
-        closeTest();
+        if (typeof addTest === 'function') {
+          addTest(currentTest);
+        }
+        if (typeof closeTest === 'function') {
+          closeTest();
+        }
       })
       .catch(error => console.error("Error saving test:", error));
   };
@@ -237,7 +240,7 @@ const ELA = ({ closeTest, addTest }) => {
       <div className="action-btns-cnt">
         <div
           className="course-delete-btn cancel-test-btn"
-          onClick={() => closeTest()}
+          onClick={() => typeof closeTest === 'function' && closeTest()}
         >
           Cancel
         </div>
