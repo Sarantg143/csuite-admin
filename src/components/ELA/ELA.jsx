@@ -265,34 +265,26 @@ const ELA = ({ data, closeTest, addTest }) => {
               )}
             </div>
           </div>
-          <div className="ela-description-cnt">
-            <p>Tags</p>
-            <input
-              type="text"
-              className="ela-tags description-input"
-            />
+          <div
+            className="course-create-btn"
+            onClick={questionValidation() ? handleNext : null}
+          >
+            Add Question
           </div>
         </div>
       </div>
       <div className="action-btns-cnt">
         <div
           className="course-delete-btn cancel-test-btn"
-          onClick={() => closeTest()}
+          onClick={closeTest}
         >
           Cancel
         </div>
         <div
-          className="course-delete-btn save-next"
-          onClick={() => handleNext()}
-          style={{
-            background: !questionValidation() && "gray",
-            pointerEvents: !questionValidation() && "none",
-          }}
+          className="course-delete-btn"
+          onClick={questionValidation() ? handleAddTest : null}
         >
-          Save and Next
-        </div>
-        <div className="add-new-lesson-btn" onClick={() => handleAddTest()}>
-          Upload
+          Save Test
         </div>
       </div>
     </div>
