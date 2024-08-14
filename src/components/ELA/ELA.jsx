@@ -20,6 +20,8 @@ const ELA = ({ data, closeTest, addTest }) => {
   const [sectionDropDown, setSectionDropDown] = useState(false);
   const [selectedSection, setSelectedSection] = useState(null);
   const [sectionDuration, setSectionDuration] = useState({ hours: 0, minutes: 0 });
+  const [editingDuration, setEditingDuration] = useState(false);
+  const [newDuration, setNewDuration] = useState({ hours: 0, minutes: 0 });
 
   const handleChoiceSelect = (index, value) => {
     setDropDown(false);
@@ -78,14 +80,28 @@ const ELA = ({ data, closeTest, addTest }) => {
     }
   };
 
-  const handleAddTest = async () => {
+  const handleUpdateDuration = async () => {
     try {
-      if (!currentQuestion.section) {
-        console.error("Section is not selected");
-        return;
-      }
+      await axios.put(`https://csuite-production.up.railway.app/api/question/66bc5fbb7b56debaadf7377e/sections/${selectedSection}/duration`, {
+        duration: newDuration
+      });
+      setSectionDuration(newDuration);
+      setEditingDuration(false);
+    } catch (error) {
+      console.error("Error updating section duration:", error.message);
+    }
+  };
 
-      const response = await axios.post(`https://csuite-production.up.railway.app/api/question/66bc5fbb7b56debaadf7377e/sections/${currentQuestion.section}/questions`, currentQuestion);
+  const handleAddTest = async () => {
+    if (!selectedSection) {
+      console.error("Section is not selected");
+      return;
+    }
+
+    const updatedQuestion = { ...currentQuestion, section: selectedSection };
+
+    try {
+      const response = await axios.post(`https://csuite-production.up.railway.app/api/question/66bc5fbb7b56debaadf7377e/sections/${selectedSection}/questions`, updatedQuestion);
 
       if (response.status === 201 || response.status === 200) {
         addTest(currentTest);
@@ -239,9 +255,9 @@ const ELA = ({ data, closeTest, addTest }) => {
               className="ela-dropdown-box"
               onClick={() => setSectionDropDown(!sectionDropDown)}
             >
-              <p>{selectedSection ? `Section ${selectedSection}` : "Select Section"}</p>
+              <p>{selectedSection ? `Section ${selectedSection}` : "Choose Section"}</p>
               {sectionDropDown && (
-                <div className="ela-dropdown-options">
+                <div className="ela-dropdown-cnt">
                   <div
                     className="ela-dropdown-element"
                     onClick={() => {
@@ -278,6 +294,25 @@ const ELA = ({ data, closeTest, addTest }) => {
             {selectedSection && (
               <div className="section-duration">
                 <p>Duration: {sectionDuration.hours} hours {sectionDuration.minutes} minutes</p>
+                {editingDuration ? (
+                  <div>
+                    <input
+                      type="number"
+                      value={newDuration.hours}
+                      onChange={(e) => setNewDuration({ ...newDuration, hours: e.target.value })}
+                      placeholder="Hours"
+                    />
+                    <input
+                      type="number"
+                      value={newDuration.minutes}
+                      onChange={(e) => setNewDuration({ ...newDuration, minutes: e.target.value })}
+                      placeholder="Minutes"
+                    />
+                    <button onClick={handleUpdateDuration}>Save Duration</button>
+                  </div>
+                ) : (
+                  <button onClick={() => setEditingDuration(true)}>Edit Duration</button>
+                )}
               </div>
             )}
           </div>
