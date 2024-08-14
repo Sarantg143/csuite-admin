@@ -99,6 +99,9 @@ const handleAddTest = async () => {
     return;
   }
 
+  // Log currentTest state
+  console.log("Current Test State:", currentTest);
+
   // Check if currentTest is not empty
   if (currentTest.length === 0) {
     console.error("No questions to add.");
@@ -109,13 +112,13 @@ const handleAddTest = async () => {
   const payload = currentTest.map((q) => ({
     question: q.question || "",
     options: q.choices || [],
-    answer: q.answer?.value || "",  // Ensure that answer.value is available
-    description: q.description || "",  // Default to empty string if not available
-    difficulty: q.difficulty || "Easy",  // Default to "Easy" if not specified
-    tags: q.tags || [],  // Default to empty array if not specified
+    answer: q.answer?.value || "",
+    description: q.description || "",
+    difficulty: q.difficulty || "Easy",
+    tags: q.tags || [],
   }));
 
-  console.log("Request payload:", payload);  // Log payload for debugging
+  console.log("Request payload:", { questions: payload });  // Log payload for debugging
 
   try {
     const response = await axios.post(
@@ -133,7 +136,6 @@ const handleAddTest = async () => {
     console.error("Error saving test:", error.message);
   }
 };
-
 
 //  const handleAddTest = async () => {
 //    if (!selectedSection) {
