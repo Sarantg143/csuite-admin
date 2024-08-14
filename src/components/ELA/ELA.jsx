@@ -38,22 +38,21 @@ const ELA = ({ data, closeTest, addTest }) => {
   };
 
 const handleNext = () => {
-  console.log("Current Question before adding:", currentQuestion);
+    console.log("Current Question before adding:", currentQuestion);
 
-  if (questionValidation()) {
-    setCurrentTest((prev) => {
-      const updatedTest = [...prev, currentQuestion];
-      console.log("Updated Test after adding question:", updatedTest);
-      return updatedTest;
-    });
+    if (questionValidation()) {
+      setCurrentTest((prev) => {
+        const updatedTest = [...prev, currentQuestion];
+        console.log("Updated Test after adding question:", updatedTest);
+        return updatedTest;
+      });
 
-    // Reset currentQuestion after adding to the currentTest
-    setCurrentQuestion(initialState);
-  } else {
-    console.warn("Current question is not valid. Check question, choices, and answer.");
-  }
-};
-
+      // Reset currentQuestion after adding to the currentTest
+      setCurrentQuestion(initialState);
+    } else {
+      console.warn("Current question is not valid. Check question, choices, and answer.");
+    }
+  };
 
 
   const checkQuestionMatch = (index) => {
@@ -91,51 +90,49 @@ const handleNext = () => {
   };
 
 
-const handleAddTest = async () => {
-  console.log("Current Test before adding:", currentTest);
+ const handleAddTest = async () => {
+    console.log("Current Test before adding:", currentTest);
 
-  if (!selectedSection) {
-    console.error("Section is not selected");
-    return;
-  }
-
-  if (currentTest.length === 0) {
-    console.error("No questions to add.");
-    return;
-  }
-
-  const payload = {
-    questions: currentTest.map((q) => ({
-      question: q.question || "",
-      options: q.choices || [],
-      answer: q.answer?.value || "",
-      description: q.description || "",
-      difficulty: q.difficulty || "Easy",
-      tags: q.tags || [],
-    })),
-  };
-
-  console.log("Request payload:", payload);
-
-  try {
-    const response = await axios.post(
-      `https://csuite-production.up.railway.app/api/question/66bc5fbb7b56debaadf7377e/sections/${selectedSection}/questions`,
-      payload
-    );
-    console.log("Response:", response);
-
-    if (response.status === 201 || response.status === 200) {
-      addTest(currentTest);
-      closeTest();
-    } else {
-      console.error("Failed to save the test. Server responded with:", response.status);
+    if (!selectedSection) {
+      console.error("Section is not selected");
+      return;
     }
-  } catch (error) {
-    console.error("Error saving test:", error.message);
-  }
-};
 
+    if (currentTest.length === 0) {
+      console.error("No questions to add.");
+      return;
+    }
 
+    const payload = {
+      questions: currentTest.map((q) => ({
+        question: q.question || "",
+        options: q.choices || [],
+        answer: q.answer?.value || "",
+        description: q.description || "",
+        difficulty: q.difficulty || "Easy",
+        tags: q.tags || [],
+      })),
+    };
+
+    console.log("Request payload:", payload);
+
+    try {
+      const response = await axios.post(
+        `https://csuite-production.up.railway.app/api/question/66bc5fbb7b56debaadf7377e/sections/${selectedSection}/questions`,
+        payload
+      );
+      console.log("Response:", response);
+
+      if (response.status === 201 || response.status === 200) {
+        addTest(currentTest);
+        closeTest();
+      } else {
+        console.error("Failed to save the test. Server responded with:", response.status);
+      }
+    } catch (error) {
+      console.error("Error saving test:", error.message);
+    }
+  };
 
 
 //  const handleAddTest = async () => {
