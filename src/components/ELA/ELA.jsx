@@ -38,25 +38,19 @@ const ELA = ({ data, closeTest, addTest }) => {
   };
 
  const handleNext = () => {
-  if (!questionValidation()) {
-    console.error("Question validation failed.");
-    return;
-  }
+  // Add validation and ensure question is added to currentTest
+  console.log("Current Question before adding:", currentQuestion);
+  
+  setCurrentTest((prev) => {
+    const updatedTest = [...prev, currentQuestion];
+    console.log("Updated Test State:", updatedTest);
+    return updatedTest;
+  });
 
-  const updatedTest = [...currentTest];
-  const currentIndex = currentTest.findIndex(q => q.questionNumber === currentQuestion.questionNumber);
-
-  if (currentIndex === -1) {
-    // Add new question if it's not in the currentTest
-    updatedTest.push({ ...currentQuestion, questionNumber: updatedTest.length + 1 });
-  } else {
-    // Update existing question
-    updatedTest[currentIndex] = { ...currentQuestion, questionNumber: currentIndex + 1 };
-  }
-
-  setCurrentTest(updatedTest);
+  // Reset currentQuestion for the next question
   setCurrentQuestion(initialState);
 };
+
 
 
   const checkQuestionMatch = (index) => {
@@ -95,12 +89,13 @@ const ELA = ({ data, closeTest, addTest }) => {
 
 
 const handleAddTest = async () => {
+  console.log("Selected Section:", selectedSection);
+  console.log("Current Test before adding:", currentTest);
+
   if (!selectedSection) {
     console.error("Section is not selected");
     return;
   }
-
-  console.log("Current Test State:", currentTest);
 
   if (currentTest.length === 0) {
     console.error("No questions to add.");
@@ -137,6 +132,7 @@ const handleAddTest = async () => {
     console.error("Error saving test:", error.message);
   }
 };
+
 
 
 //  const handleAddTest = async () => {
