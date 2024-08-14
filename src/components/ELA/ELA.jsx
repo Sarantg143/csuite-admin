@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const ELA = ({ data, closeTest, addTest }) => {
@@ -15,6 +15,23 @@ const ELA = ({ data, closeTest, addTest }) => {
   const [dropDown, setDropDown] = useState(false);
   const [difficultyDropDown, setDifficultyDropDown] = useState(false);
   const [sectionDropDown, setSectionDropDown] = useState(false);
+  const [selectedSection, setSelectedSection] = useState(null);
+  const [sectionDuration, setSectionDuration] = useState({ hours: 0, minutes: 0 });
+
+  useEffect(() => {
+    if (selectedSection) {
+      fetchSectionDuration(selectedSection);
+    }
+  }, [selectedSection]);
+
+  const fetchSectionDuration = async (sectionNumber) => {
+    try {
+      const response = await axios.get(`https://csuite-production.up.railway.app/api/question/66bc5fbb7b56debaadf7377e/sections/${sectionNumber}/duration`);
+      setSectionDuration(response.data.duration);
+    } catch (error) {
+      console.error("Error fetching section duration:", error.message);
+    }
+  };
 
   const handleChoiceSelect = (index, value) => {
     setDropDown(false);
@@ -64,9 +81,12 @@ const ELA = ({ data, closeTest, addTest }) => {
 
   const handleAddTest = async () => {
     try {
-      const response = await axios.post("https://csuite-production.up.railway.app/api/question/", {
-        sections: currentTest,
-      });
+      if (!currentQuestion.section) {
+        console.error("Section is not selected");
+        return;
+      }
+
+      const response = await axios.post(`https://csuite-production.up.railway.app/api/question/66bc5fbb7b56debaadf7377e/sections/${currentQuestion.section}/questions`, currentQuestion);
 
       if (response.status === 201 || response.status === 200) {
         if (typeof addTest === "function") {
@@ -225,19 +245,19 @@ const ELA = ({ data, closeTest, addTest }) => {
                 <div className="ela-dropdown-options">
                   <div
                     className="ela-dropdown-element"
-                    onClick={() => setCurrentQuestion({ ...currentQuestion, section: "Section 1" })}
+                    onClick={() => setSelectedSection(1)}
                   >
                     <p>Section 1</p>
                   </div>
                   <div
                     className="ela-dropdown-element"
-                    onClick={() => setCurrentQuestion({ ...currentQuestion, section: "Section 2" })}
+                    onClick={() => setSelectedSection(2)}
                   >
                     <p>Section 2</p>
                   </div>
                   <div
                     className="ela-dropdown-element"
-                    onClick={() => setCurrentQuestion({ ...currentQuestion, section: "Section 3" })}
+                    onClick={() => setSelectedSection(3)}
                   >
                     <p>Section 3</p>
                   </div>
@@ -245,26 +265,34 @@ const ELA = ({ data, closeTest, addTest }) => {
               )}
             </div>
           </div>
-          <div
-            className="course-create-btn"
-            onClick={questionValidation() ? handleNext : null}
-          >
-            Add Question
+          <div className="ela-description-cnt">
+            <p>Tags</p>
+            <input
+              type="text"
+              className="ela-tags description-input"
+            />
           </div>
         </div>
       </div>
       <div className="action-btns-cnt">
         <div
           className="course-delete-btn cancel-test-btn"
-          onClick={closeTest}
+          onClick={() => closeTest()}
         >
           Cancel
         </div>
         <div
-          className="course-delete-btn"
-          onClick={questionValidation() ? handleAddTest : null}
+          className="course-delete-btn save-next"
+          onClick={() => handleNext()}
+          style={{
+            background: !questionValidation() && "gray",
+            pointerEvents: !questionValidation() && "none",
+          }}
         >
-          Save Test
+          Save and Next
+        </div>
+        <div className="add-new-lesson-btn" onClick={() => handleAddTest()}>
+          Upload
         </div>
       </div>
     </div>
