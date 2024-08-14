@@ -98,7 +98,7 @@ const handleAddTest = async () => {
     console.error("Section is not selected");
     return;
   }
-  const updatedQuestion = { ...currentQuestion, section: selectedSection };
+
   // Construct the payload with only the necessary fields
   const payload = {
     questions: currentTest.map((q) => ({
@@ -114,7 +114,10 @@ const handleAddTest = async () => {
   console.log("Request payload:", payload);  // Log payload for debugging
 
   try {
-    const response = await axios.post(`https://csuite-production.up.railway.app/api/question/66bc5fbb7b56debaadf7377e/sections/${selectedSection}/questions`, payload);
+    const response = await axios.post(
+      `https://csuite-production.up.railway.app/api/question/66bc5fbb7b56debaadf7377e/sections/${selectedSection}/questions`,
+      payload
+    );
     console.log("Response:", response);  // Log response for debugging
     if (response.status === 201 || response.status === 200) {
       addTest(currentTest);
