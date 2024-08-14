@@ -37,10 +37,9 @@ const ELA = ({ data, closeTest, addTest }) => {
     setCurrentQuestion({ ...currentQuestion, choices: newChoices });
   };
 
- const handleNext = () => {
+const handleNext = () => {
   console.log("Current Question before adding:", currentQuestion);
 
-  // Validate the question before adding
   if (questionValidation()) {
     setCurrentTest((prev) => {
       const updatedTest = [...prev, currentQuestion];
@@ -48,12 +47,13 @@ const ELA = ({ data, closeTest, addTest }) => {
       return updatedTest;
     });
 
-    // Reset the question for the next one
+    // Reset currentQuestion after adding to the currentTest
     setCurrentQuestion(initialState);
   } else {
-    console.warn("Current question is not valid.");
+    console.warn("Current question is not valid. Check question, choices, and answer.");
   }
 };
+
 
 
   const checkQuestionMatch = (index) => {
@@ -92,7 +92,6 @@ const ELA = ({ data, closeTest, addTest }) => {
 
 
 const handleAddTest = async () => {
-  console.log("Selected Section:", selectedSection);
   console.log("Current Test before adding:", currentTest);
 
   if (!selectedSection) {
@@ -135,6 +134,7 @@ const handleAddTest = async () => {
     console.error("Error saving test:", error.message);
   }
 };
+
 
 
 
