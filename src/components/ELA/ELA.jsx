@@ -92,27 +92,29 @@ const ELA = ({ data, closeTest, addTest }) => {
     }
   };
 
-  const handleAddTest = async () => {
-    if (!selectedSection) {
-      console.error("Section is not selected");
-      return;
+ const handleAddTest = async () => {
+  if (!selectedSection) {
+    console.error("Section is not selected");
+    return;
+  }
+
+  const updatedQuestion = { ...currentQuestion, section: selectedSection };
+
+  console.log("Request payload:", updatedQuestion);  // Log payload
+
+  try {
+    const response = await axios.post(`https://csuite-production.up.railway.app/api/question/66bc5fbb7b56debaadf7377e/sections/${selectedSection}/questions`, updatedQuestion);
+    console.log("Response:", response);  // Log response
+    if (response.status === 201 || response.status === 200) {
+      addTest(currentTest);
+      closeTest();
+    } else {
+      console.error("Failed to save the test. Server responded with:", response.status);
     }
-
-    const updatedQuestion = { ...currentQuestion, section: selectedSection };
-
-    try {
-      const response = await axios.post(`https://csuite-production.up.railway.app/api/question/66bc5fbb7b56debaadf7377e/sections/${selectedSection}/questions`, updatedQuestion);
-
-      if (response.status === 201 || response.status === 200) {
-        addTest(currentTest);
-        closeTest();
-      } else {
-        console.error("Failed to save the test. Server responded with:", response.status);
-      }
-    } catch (error) {
-      console.error("Error saving test:", error.message);
-    }
-  };
+  } catch (error) {
+    console.error("Error saving test:", error.message);
+  }
+};
 
   return (
     <div className="ela-test-page">
