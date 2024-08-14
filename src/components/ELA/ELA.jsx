@@ -99,12 +99,18 @@ const handleAddTest = async () => {
     return;
   }
 
+  // Check if currentTest is not empty
+  if (currentTest.length === 0) {
+    console.error("No questions to add.");
+    return;
+  }
+
   // Construct the payload with only the necessary fields
   const payload = {
     questions: currentTest.map((q) => ({
-      question: q.question,
-      options: q.choices,
-      answer: q.answer?.value,  // Ensure that answer.value is available
+      question: q.question || "",
+      options: q.choices || [],
+      answer: q.answer?.value || "",  // Ensure that answer.value is available
       description: q.description || "",  // Default to empty string if not available
       difficulty: q.difficulty || "Easy",  // Default to "Easy" if not specified
       tags: q.tags || [],  // Default to empty array if not specified
