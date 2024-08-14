@@ -92,36 +92,61 @@ const ELA = ({ data, closeTest, addTest }) => {
     }
   };
 
-  const handleAddTest = async () => {
-    if (!selectedSection) {
-      console.error("Section is not selected");
-      return;
-    }
 
-    const updatedQuestion = { ...currentQuestion, section: selectedSection };
-
-    try {
-      const response = await axios.post(`https://csuite-production.up.railway.app/api/question/66bc5fbb7b56debaadf7377e/sections/${selectedSection}/questions`, updatedQuestion);
-{
-        questions: currentTest.map((q) => ({
-          question: q.question,
-          options: q.choices,
-          answer: q.answer.value,
-          description: q.description,
-          difficulty: q.difficulty,
-          tags: q.tags,
-        })),
-      });
-      if (response.status === 201 || response.status === 200) {
-        addTest(currentTest);
-        closeTest();
-      } else {
-        console.error("Failed to save the test. Server responded with:", response.status);
-      }
-    } catch (error) {
-      console.error("Error saving test:", error.message);
-    }
+const handleAddTest = async () => {
+  if (!selectedSection) {
+    console.error("Section is not selected");
+    return;
+  }
+  const updatedQuestion = { ...currentQuestion, section: selectedSection };
+  // Construct the payload with only the necessary fields
+  const payload = {
+    questions: currentTest.map((q) => ({
+      question: q.question,
+      options: q.choices,
+      answer: q.answer?.value,  // Ensure that answer.value is available
+      description: q.description || "",  // Default to empty string if not available
+      difficulty: q.difficulty || "Easy",  // Default to "Easy" if not specified
+      tags: q.tags || [],  // Default to empty array if not specified
+    })),
   };
+
+  console.log("Request payload:", payload);  // Log payload for debugging
+
+  try {
+    const response = await axios.post(`https://csuite-production.up.railway.app/api/question/66bc5fbb7b56debaadf7377e/sections/${selectedSection}/questions`, payload);
+    console.log("Response:", response);  // Log response for debugging
+    if (response.status === 201 || response.status === 200) {
+      addTest(currentTest);
+      closeTest();
+    } else {
+      console.error("Failed to save the test. Server responded with:", response.status);
+    }
+  } catch (error) {
+    console.error("Error saving test:", error.message);
+  }
+};
+
+//  const handleAddTest = async () => {
+//    if (!selectedSection) {
+//      console.error("Section is not selected");
+//      return;
+//    }
+//    const updatedQuestion = { ...currentQuestion, section: selectedSection };
+//
+//    try {
+//      const response = await axios.post(`https://csuite-production.up.railway.app/api/question/66bc5fbb7b56debaadf7377e/sections/${selectedSection}/questions`, updatedQuestion);
+
+//      if (response.status === 201 || response.status === 200) {
+//        addTest(currentTest);
+//        closeTest();
+//      } else {
+//        console.error("Failed to save the test. Server responded with:", response.status);
+//      }
+//    } catch (error) {
+//      console.error("Error saving test:", error.message);
+//    }
+//  };
 
   return (
     <div className="ela-test-page">
