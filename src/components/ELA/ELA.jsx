@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
- 
+
 const ELA = ({ closeTest, addTest }) => {
   const initialState = {
     question: "",
@@ -12,12 +12,14 @@ const ELA = ({ closeTest, addTest }) => {
     description: "",
     difficulty: "",
     tags: "",
+    section: "", // Add a field for the selected section
   };
 
   const [currentTest, setCurrentTest] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(initialState);
   const [dropDown, setDropDown] = useState(false);
   const [difficultyDropDown, setDifficultyDropDown] = useState(false);
+  const [sectionDropDown, setSectionDropDown] = useState(false); // Dropdown for sections
 
   useEffect(() => {
     axios.get("https://csuite-production.up.railway.app/api/question/")
@@ -65,7 +67,8 @@ const ELA = ({ closeTest, addTest }) => {
       currentQuestion.hours &&
       currentQuestion.minutes &&
       currentQuestion.description &&
-      currentQuestion.difficulty
+      currentQuestion.difficulty &&
+      currentQuestion.section // Validate section selection
     );
   };
 
@@ -158,6 +161,30 @@ const ELA = ({ closeTest, addTest }) => {
         </div>
         <div className="ela-question-info-cnt">
           <div className="ela-description-cnt">
+            <p>Select Section</p>
+            <div
+              className="ela-dropdown-box"
+              onClick={() => setSectionDropDown(!sectionDropDown)}
+            >
+              <p>{currentQuestion.section || "Choose a section"}</p>
+              {sectionDropDown && (
+                <div className="ela-dropdown-cnt">
+                  {["Section 1", "Section 2", "Section 3"].map((section, index) => (
+                    <div
+                      key={index}
+                      className="ela-dropdown-element"
+                      onClick={() =>
+                        setCurrentQuestion({ ...currentQuestion, section: section })
+                      }
+                    >
+                      <p>{section}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="ela-description-cnt">
             <p>Set Duration</p>
             <div className="ela-timer-input-cnt">
               <div className="ela-timer-cover">
@@ -245,17 +272,16 @@ const ELA = ({ closeTest, addTest }) => {
           Cancel
         </div>
         <div
-          className="course-delete-btn save-next"
-          onClick={() => handleNext()}
-          style={{
-            background: !questionValidation() ? "gray" : "#8949ff",
-            pointerEvents: !questionValidation() ? "none" : "auto",
-          }}
+          className="course-delete-btn save-test-btn"
+          onClick={questionValidation() ? handleAddTest : null}
         >
-          Save and Next
+          Save Test
         </div>
-        <div className="add-new-lesson-btn" onClick={() => handleAddTest()}>
-          Upload
+        <div
+          className="course-create-btn"
+          onClick={questionValidation() ? handleNext : null}
+        >
+          Add Question
         </div>
       </div>
     </div>
