@@ -1,7 +1,17 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-const [currentTest, setCurrentTest] = useState(data || []);
+const ELA = ({ data, addTest, closeTest }) => {
+  const initialState = {
+    question: "",
+    choices: ["", "", "", ""],
+    answer: { index: null, value: "" },
+    difficulty: "",
+    tags: "",
+    description: "",
+  };
+
+  const [currentTest, setCurrentTest] = useState(data || []);
   const [currentQuestion, setCurrentQuestion] = useState(initialState);
   const [dropDown, setDropDown] = useState(false);
   const [difficultyDropDown, setDifficultyDropDown] = useState(false);
@@ -13,8 +23,15 @@ const [currentTest, setCurrentTest] = useState(data || []);
     tags: "",
     description: "",
   });
- const [editingDuration, setEditingDuration] = useState(false);
-  const [newDuration, setNewDuration] = useState({ hours: 0, minutes: 0 });
+  const [sectionDuration, setSectionDuration] = useState({
+    hours: 0,
+    minutes: 0,
+  });
+  const [editingDuration, setEditingDuration] = useState(false);
+  const [newDuration, setNewDuration] = useState({
+    hours: 0,
+    minutes: 0,
+  });
 
   const handleChoiceSelect = (index, value) => {
     setDropDown(false);
@@ -29,7 +46,8 @@ const [currentTest, setCurrentTest] = useState(data || []);
     newChoices[index] = value;
     setCurrentQuestion({ ...currentQuestion, choices: newChoices });
   };
-const handleNext = () => {
+
+  const handleNext = () => {
     console.log("Current Question before adding:", currentQuestion);
 
     if (questionValidation()) {
@@ -46,7 +64,6 @@ const handleNext = () => {
     }
   };
 
-
   const checkQuestionMatch = (index) => {
     if (currentTest?.indexOf(currentQuestion) === index) return "#8949ff";
     return "transparent";
@@ -55,34 +72,33 @@ const handleNext = () => {
   const questionValidation = () => {
     return (
       currentQuestion?.question.length > 5 &&
-      currentQuestion?.answer &&
+      currentQuestion?.answer?.value &&
       currentQuestion?.choices?.length === 4
     );
   };
 
- const fetchSectionDetails = async (sectionNumber) => {
+  const fetchSectionDetails = async (sectionNumber) => {
     try {
-        const response = await axios.get(`https://csuite-production.up.railway.app/api/question/66bd7906cf73babea075022a/sections/${sectionNumber}/details`);
-        
-        const { duration, difficulty, tags, description } = response.data;
-        setSectionDuration(duration); // Assuming `duration` is in the format { hours: ..., minutes: ... }
-        
-        setSectionDifficulty(difficulty);
-        setSectionTags(tags);
-        setSectionDescription(description);
-    } catch (error) {
-        console.error("Error fetching section details:", error.message);
-    }
-};
+      const response = await axios.get(
+        `https://csuite-production.up.railway.app/api/question/66bd7906cf73babea075022a/sections/${sectionNumber}/details`
+      );
 
-const handleUpdateDuration = async () => {
+      const { duration, difficulty, tags, description } = response.data;
+      setSectionDetails({ duration, difficulty, tags, description });
+      setSectionDuration(duration); // Assuming `duration` is in the format { hours: ..., minutes: ... }
+    } catch (error) {
+      console.error("Error fetching section details:", error.message);
+    }
+  };
+
+  const handleUpdateDuration = async () => {
     if (!selectedSection) {
       console.error("Section is not selected");
       return;
     }
 
     const payload = {
-      duration: sectionDetails.duration,
+      duration: newDuration,
       difficulty: sectionDetails.difficulty,
       tags: sectionDetails.tags,
       description: sectionDetails.description,
@@ -103,6 +119,7 @@ const handleUpdateDuration = async () => {
       console.error("Error updating section details:", error.message);
     }
   };
+
 
 const handleAddTest = async () => {
     if (!selectedSection) {
