@@ -13,6 +13,8 @@ const [currentTest, setCurrentTest] = useState(data || []);
     tags: "",
     description: "",
   });
+ const [editingDuration, setEditingDuration] = useState(false);
+  const [newDuration, setNewDuration] = useState({ hours: 0, minutes: 0 });
 
   const handleChoiceSelect = (index, value) => {
     setDropDown(false);
