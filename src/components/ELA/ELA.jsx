@@ -379,72 +379,58 @@ const ELA = ({ data, addTest, closeTest }) => {
             />
           </div>
           <div className="ela-description-cnt">
-            <p>Select Test Difficulty</p>
-            <div
-              className="ela-dropdown-box"
-              onClick={() => setDifficultyDropDown(!difficultyDropDown)}
-            >
-              <p>{currentQuestion.difficulty || "Choose Difficulty"}</p>
-              {difficultyDropDown && (
-                <div className="ela-dropdown-cnt">
+          <p>Select Test Difficulty</p>
+          <div className="ela-dropdown-box" onClick={() => setDifficultyDropDown(!difficultyDropDown)}>
+            <p>{currentQuestion.difficulty || "Choose Difficulty"}</p>
+            {difficultyDropDown && (
+              <div className="ela-dropdown-cnt">
+                {["Easy", "Medium", "Hard"].map((difficulty) => (
                   <div
+                    key={difficulty}
                     className="ela-dropdown-element"
-                    onClick={() => setCurrentQuestion({ ...currentQuestion, difficulty: "Easy" })}
+                    onClick={() => setCurrentQuestion({ ...currentQuestion, difficulty })}
                   >
-                    <p style={{ color: "green" }}>Easy</p>
+                    <p style={{ color: difficulty === "Easy" ? "green" : difficulty === "Medium" ? "orange" : "red" }}>
+                      {difficulty}
+                    </p>
                   </div>
-                  <div
-                    className="ela-dropdown-element"
-                    onClick={() => setCurrentQuestion({ ...currentQuestion, difficulty: "Medium" })}
-                  >
-                    <p style={{ color: "orange" }}>Medium</p>
-                  </div>
-                  <div
-                    className="ela-dropdown-element"
-                    onClick={() => setCurrentQuestion({ ...currentQuestion, difficulty: "Hard" })}
-                  >
-                    <p style={{ color: "red" }}>Hard</p>
-                  </div>
-                </div>
-              )}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
-          <div className="ela-description-cnt">
-            <p>Tags</p>
-            <input
-              type="text"
-              className="ela-tags description-input"
-              value={currentQuestion?.tags}
-              onChange={(e) =>
-                setCurrentQuestion({
-                  ...currentQuestion,
-                  tags: e.target.value,
-                })
-              }
-            />
-          </div>
+        </div>
+        <div className="ela-description-cnt">
+          <p>Tags</p>
+          <input
+            type="text"
+            className="ela-tags description-input"
+            value={currentQuestion?.tags}
+            onChange={(e) =>
+              setCurrentQuestion({
+                ...currentQuestion,
+                tags: e.target.value,
+              })
+            }
+          />
         </div>
       </div>
       <div className="action-btns-cnt">
-        <div
-          className="course-delete-btn cancel-test-btn"
-          onClick={() => closeTest()}
-        >
+        <button className="course-delete-btn cancel-test-btn" onClick={closeTest}>
           Cancel
-        </div>
-        <div
+        </button>
+        <button
           className="course-delete-btn save-next"
-          onClick={() => handleNext()}
+          onClick={handleNext}
           style={{
-            background: !questionValidation() && "gray",
-            pointerEvents: !questionValidation() && "none",
+            background: !questionValidation() ? "gray" : "#4caf50",
+            pointerEvents: !questionValidation() ? "none" : "auto",
           }}
         >
           Save and Next
-        </div>
-        <div className="add-new-lesson-btn" onClick={() => handleAddTest()}>
+        </button>
+        <button className="add-new-lesson-btn" onClick={handleAddTest}>
           Upload
-        </div>
+        </button>
       </div>
     </div>
   );
