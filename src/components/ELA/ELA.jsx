@@ -121,7 +121,7 @@ const ELA = ({ data, addTest, closeTest }) => {
     }
   };
 
-  const handleAddTest = async () => {
+ const handleAddTest = async () => {
   if (!selectedSection) {
     console.error("Section is not selected");
     return;
@@ -149,8 +149,18 @@ const ELA = ({ data, addTest, closeTest }) => {
     console.log("Response:", response);
 
     if (response.status === 200) {
-      addTest(currentTest);
-      closeTest();
+      // Ensure addTest and closeTest are functions
+      if (typeof addTest === 'function') {
+        addTest(currentTest);
+      } else {
+        console.error("addTest is not a function");
+      }
+
+      if (typeof closeTest === 'function') {
+        closeTest();
+      } else {
+        console.error("closeTest is not a function");
+      }
     } else {
       console.error("Failed to save the test. Server responded with:", response.status);
     }
@@ -395,6 +405,7 @@ const ELA = ({ data, addTest, closeTest }) => {
         <div className="ela-buttons">
           <button onClick={handleNext}>Add Question</button>
           <button onClick={handleAddTest}>Save Test</button>
+          
         </div>
       </div>
     </div>
