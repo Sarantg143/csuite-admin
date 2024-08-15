@@ -68,71 +68,59 @@ const handleNext = () => {
     );
   };
 
-  const fetchSectionDuration = async (sectionNumber) => {
+ const fetchSectionDetails = async (sectionNumber) => {
     try {
-      const response = await axios.get(`https://csuite-production.up.railway.app/api/question/66bc5fbb7b56debaadf7377e/sections/${sectionNumber}/duration`);
-      setSectionDuration(response.data.duration);
+        const response = await axios.get(`https://csuite-production.up.railway.app/api/question/66bd7906cf73babea075022a/sections/${sectionNumber}/details`);
+        
+        const { duration, difficulty, tags, description } = response.data;
+        setSectionDuration(duration); // Assuming `duration` is in the format { hours: ..., minutes: ... }
+        
+        setSectionDifficulty(difficulty);
+        setSectionTags(tags);
+        setSectionDescription(description);
     } catch (error) {
-      console.error("Error fetching section duration:", error.message);
+        console.error("Error fetching section details:", error.message);
     }
-  };
-
-  const handleUpdateDuration = async () => {
-    try {
-      await axios.put(`https://csuite-production.up.railway.app/api/question/66bc5fbb7b56debaadf7377e/sections/${selectedSection}/duration`, {
-        duration: newDuration
-      });
-      setSectionDuration(newDuration);
-      setEditingDuration(false);
-    } catch (error) {
-      console.error("Error updating section duration:", error.message);
-    }
-  };
+};
 
 
- const handleAddTest = async () => {
-    console.log("Current Test before adding:", currentTest);
 
+const handleAddTest = async () => {
     if (!selectedSection) {
-      console.error("Section is not selected");
-      return;
+        console.error("Section is not selected");
+        return;
     }
 
     if (currentTest.length === 0) {
-      console.error("No questions to add.");
-      return;
+        console.error("No questions to add.");
+        return;
     }
-
-    const payload = {
-      questions: currentTest.map((q) => ({
+    const payload = currentTest.map((q) => ({
         question: q.question || "",
         options: q.choices || [],
         answer: q.answer?.value || "",
-        description: q.description || "",
-        difficulty: q.difficulty || "Easy",
-        tags: q.tags || [],
-      })),
-    };
+    }));
 
     console.log("Request payload:", payload);
 
     try {
-      const response = await axios.post(
-        `https://csuite-production.up.railway.app/api/question/66bc5fbb7b56debaadf7377e/sections/${selectedSection}/questions`,
-        payload
-      );
-      console.log("Response:", response);
+        const response = await axios.put(
+            `https://csuite-production.up.railway.app/api/question/66bd7906cf73babea075022a/sections/${selectedSection}/questions`,
+            payload
+        );
 
-      if (response.status === 201 || response.status === 200) {
-        addTest(currentTest);
-        closeTest();
-      } else {
-        console.error("Failed to save the test. Server responded with:", response.status);
-      }
+        console.log("Response:", response);
+
+        if (response.status === 200) {
+            addTest(currentTest);  
+            closeTest();           
+        } else {
+            console.error("Failed to save the test. Server responded with:", response.status);
+        }
     } catch (error) {
-      console.error("Error saving test:", error.message);
+        console.error("Error saving test:", error.message);
     }
-  };
+};
 
 
 //  const handleAddTest = async () => {
