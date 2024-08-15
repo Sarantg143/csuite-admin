@@ -120,68 +120,44 @@ const ELA = ({ data, addTest, closeTest }) => {
     }
   };
 
-
-const handleAddTest = async () => {
+  const handleAddTest = async () => {
     if (!selectedSection) {
-        console.error("Section is not selected");
-        return;
+      console.error("Section is not selected");
+      return;
     }
 
     if (currentTest.length === 0) {
-        console.error("No questions to add.");
-        return;
+      console.error("No questions to add.");
+      return;
     }
     const payload = currentTest.map((q) => ({
-        question: q.question || "",
-        options: q.choices || [],
-        answer: q.answer?.value || "",
+      question: q.question || "",
+      options: q.choices || [],
+      answer: q.answer?.value || "",
     }));
 
     console.log("Request payload:", payload);
 
     try {
-        const response = await axios.put(
-            `https://csuite-production.up.railway.app/api/question/66bd7906cf73babea075022a/sections/${selectedSection}/questions`,
-            payload
-        );
+      const response = await axios.put(
+        `https://csuite-production.up.railway.app/api/question/66bd7906cf73babea075022a/sections/${selectedSection}/questions`,
+        payload
+      );
 
-        console.log("Response:", response);
+      console.log("Response:", response);
 
-        if (response.status === 200) {
-            addTest(currentTest);  
-            closeTest();           
-        } else {
-            console.error("Failed to save the test. Server responded with:", response.status);
-        }
+      if (response.status === 200) {
+        addTest(currentTest);
+        closeTest();
+      } else {
+        console.error("Failed to save the test. Server responded with:", response.status);
+      }
     } catch (error) {
-        console.error("Error saving test:", error.message);
+      console.error("Error saving test:", error.message);
     }
-};
+  };
 
-
-//  const handleAddTest = async () => {
-//    if (!selectedSection) {
-//      console.error("Section is not selected");
-//      return;
-//    }
-//    const updatedQuestion = { ...currentQuestion, section: selectedSection };
-//
-//    try {
-//      const response = await axios.post(`https://csuite-production.up.railway.app/api/question/66bc5fbb7b56debaadf7377e/sections/${selectedSection}/questions`, updatedQuestion);
-
-//      if (response.status === 201 || response.status === 200) {
-//        addTest(currentTest);
-//        closeTest();
-//      } else {
-//        console.error("Failed to save the test. Server responded with:", response.status);
-//      }
-//    } catch (error) {
-//      console.error("Error saving test:", error.message);
-//    }
-//  };
-
-  
-return (
+  return (
     <div className="ela-test-page">
       <p className="ela-title">Create or Edit your ELA assessment</p>
       <div className="questions-block-cnt">
@@ -278,15 +254,13 @@ return (
                   }
                   onChange={(e) => handleChoiceInput(0, e.target.value)}
                 />
-              </div>
+                              </div>
               <div className="choice ela-choice">
                 <p>Choice two</p>
                 <input
                   type="text"
                   placeholder="Enter choice two"
-                  value={
-                    currentQuestion?.choices[1] ? currentQuestion?.choices[1] : ""
-                  }
+                  value={currentQuestion?.choices[1] ? currentQuestion?.choices[1] : ""}
                   onChange={(e) => handleChoiceInput(1, e.target.value)}
                 />
               </div>
@@ -295,9 +269,7 @@ return (
                 <input
                   type="text"
                   placeholder="Enter choice three"
-                  value={
-                    currentQuestion?.choices[2] ? currentQuestion?.choices[2] : ""
-                  }
+                  value={currentQuestion?.choices[2] ? currentQuestion?.choices[2] : ""}
                   onChange={(e) => handleChoiceInput(2, e.target.value)}
                 />
               </div>
@@ -306,162 +278,121 @@ return (
                 <input
                   type="text"
                   placeholder="Enter choice four"
-                  value={
-                    currentQuestion?.choices[3] ? currentQuestion?.choices[3] : ""
-                  }
+                  value={currentQuestion?.choices[3] ? currentQuestion?.choices[3] : ""}
                   onChange={(e) => handleChoiceInput(3, e.target.value)}
                 />
               </div>
             </div>
           </div>
         </div>
-        <div className="ela-question-info-cnt">
-          <div className="ela-description-cnt">
+        <div className="ela-section-cnt">
+          <div className="ela-section">
             <p>Select Section</p>
-            <div
-              className="ela-dropdown-box"
-              onClick={() => setSectionDropDown(!sectionDropDown)}
-            >
-              <p>{selectedSection ? `Section ${selectedSection}` : "Choose Section"}</p>
+            <div className="section-selector">
+              <p onClick={() => setSectionDropDown(true)}>
+                {selectedSection ? `Section ${selectedSection}` : "Not selected"}
+              </p>
               {sectionDropDown && (
-                <div className="ela-dropdown-cnt">
-                  <div
-                    className="ela-dropdown-element"
-                    onClick={() => {
-                      setSelectedSection(1);
-                      setSectionDropDown(false);
-                      fetchSectionDuration(1);
-                    }}
-                  >
-                    <p>Section 1</p>
-                  </div>
-                  <div
-                    className="ela-dropdown-element"
-                    onClick={() => {
-                      setSelectedSection(2);
-                      setSectionDropDown(false);
-                      fetchSectionDuration(2);
-                    }}
-                  >
-                    <p>Section 2</p>
-                  </div>
-                  <div
-                    className="ela-dropdown-element"
-                    onClick={() => {
-                      setSelectedSection(3);
-                      setSectionDropDown(false);
-                      fetchSectionDuration(3);
-                    }}
-                  >
-                    <p>Section 3</p>
-                  </div>
+                <div className="drop-down-cnt">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="drop-down-choice"
+                      onClick={() => {
+                        setSelectedSection(i + 1);
+                        fetchSectionDetails(i + 1);
+                        setSectionDropDown(false);
+                      }}
+                    >
+                      <p>Section {i + 1}</p>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
-            {selectedSection && (
-              <div className="section-duration">
-                <p>Duration: {sectionDuration.hours} hours {sectionDuration.minutes} minutes</p>
-                {editingDuration ? (
-                  <div>
-                    <input
-                      type="number"
-                      value={newDuration.hours}
-                      onChange={(e) => setNewDuration({ ...newDuration, hours: e.target.value })}
-                      placeholder="Hours"
-                    />
-                    <input
-                      type="number"
-                      value={newDuration.minutes}
-                      onChange={(e) => setNewDuration({ ...newDuration, minutes: e.target.value })}
-                      placeholder="Minutes"
-                    />
-                    <button onClick={handleUpdateDuration}>Save Duration</button>
-                  </div>
-                ) : (
-                  <button onClick={() => setEditingDuration(true)}>Edit Duration</button>
-                )}
-              </div>
-            )}
           </div>
-          <div className="ela-description-cnt">
-            <p>Description</p>
-            <textarea
-              className="ela-description description-input"
-              value={currentQuestion?.description}
-              onChange={(e) =>
-                setCurrentQuestion({
-                  ...currentQuestion,
-                  description: e.target.value,
-                })
-              }
-            />
+          <div className="ela-duration">
+            <p>Section Duration</p>
+            <div className="duration-input">
+              <input
+                type="number"
+                placeholder="Hours"
+                value={editingDuration ? newDuration.hours : sectionDuration.hours}
+                onChange={(e) =>
+                  setNewDuration({ ...newDuration, hours: Number(e.target.value) })
+                }
+                disabled={!editingDuration}
+              />
+              <span>:</span>
+              <input
+                type="number"
+                placeholder="Minutes"
+                value={editingDuration ? newDuration.minutes : sectionDuration.minutes}
+                onChange={(e) =>
+                  setNewDuration({ ...newDuration, minutes: Number(e.target.value) })
+                }
+                disabled={!editingDuration}
+              />
+              <button onClick={() => setEditingDuration(!editingDuration)}>
+                {editingDuration ? "Cancel" : "Edit"}
+              </button>
+              {editingDuration && (
+                <button onClick={handleUpdateDuration}>Save</button>
+              )}
+            </div>
           </div>
-          <div className="ela-description-cnt">
-            <p>Select Test Difficulty</p>
-            <div
-              className="ela-dropdown-box"
-              onClick={() => setDifficultyDropDown(!difficultyDropDown)}
-            >
-              <p>{currentQuestion.difficulty || "Choose Difficulty"}</p>
+          <div className="ela-difficulty">
+            <p>Difficulty</p>
+            <div className="difficulty-selector">
+              <p onClick={() => setDifficultyDropDown(true)}>
+                {sectionDetails.difficulty ? sectionDetails.difficulty : "Not selected"}
+              </p>
               {difficultyDropDown && (
-                <div className="ela-dropdown-cnt">
-                  <div
-                    className="ela-dropdown-element"
-                    onClick={() => setCurrentQuestion({ ...currentQuestion, difficulty: "Easy" })}
-                  >
-                    <p style={{ color: "green" }}>Easy</p>
-                  </div>
-                  <div
-                    className="ela-dropdown-element"
-                    onClick={() => setCurrentQuestion({ ...currentQuestion, difficulty: "Medium" })}
-                  >
-                    <p style={{ color: "orange" }}>Medium</p>
-                  </div>
-                  <div
-                    className="ela-dropdown-element"
-                    onClick={() => setCurrentQuestion({ ...currentQuestion, difficulty: "Hard" })}
-                  >
-                    <p style={{ color: "red" }}>Hard</p>
-                  </div>
+                <div className="drop-down-cnt">
+                  {["Easy", "Medium", "Hard"].map((level, i) => (
+                    <div
+                      key={i}
+                      className="drop-down-choice"
+                      onClick={() => {
+                        setSectionDetails({
+                          ...sectionDetails,
+                          difficulty: level,
+                        });
+                        setDifficultyDropDown(false);
+                      }}
+                    >
+                      <p>{level}</p>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
           </div>
-          <div className="ela-description-cnt">
+          <div className="ela-tags">
             <p>Tags</p>
             <input
               type="text"
-              className="ela-tags description-input"
-              value={currentQuestion?.tags}
+              placeholder="Enter tags"
+              value={sectionDetails.tags}
               onChange={(e) =>
-                setCurrentQuestion({
-                  ...currentQuestion,
-                  tags: e.target.value,
-                })
+                setSectionDetails({ ...sectionDetails, tags: e.target.value })
+              }
+            />
+          </div>
+          <div className="ela-description">
+            <p>Description</p>
+            <textarea
+              placeholder="Enter description"
+              value={sectionDetails.description}
+              onChange={(e) =>
+                setSectionDetails({ ...sectionDetails, description: e.target.value })
               }
             />
           </div>
         </div>
-      </div>
-      <div className="action-btns-cnt">
-        <div
-          className="course-delete-btn cancel-test-btn"
-          onClick={() => closeTest()}
-        >
-          Cancel
-        </div>
-        <div
-          className="course-delete-btn save-next"
-          onClick={() => handleNext()}
-          style={{
-            background: !questionValidation() && "gray",
-            pointerEvents: !questionValidation() && "none",
-          }}
-        >
-          Save and Next
-        </div>
-        <div className="add-new-lesson-btn" onClick={() => handleAddTest()}>
-          Upload
+        <div className="ela-buttons">
+          <button onClick={handleNext}>Add Question</button>
+          <button onClick={handleAddTest}>Save Test</button>
         </div>
       </div>
     </div>
@@ -469,7 +400,6 @@ return (
 };
 
 export default ELA;
-
 
 
  
