@@ -1,27 +1,18 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-const ELA = ({ data, closeTest, addTest }) => {
-  const initialState = {
-    question: "",
-    answer: null,
-    choices: [],
-    questionNumber: null,
-    section: null,
-    description: "",
-    difficulty: "",
-    tags: "",
-  };
-
-  const [currentTest, setCurrentTest] = useState(data || []);
+const [currentTest, setCurrentTest] = useState(data || []);
   const [currentQuestion, setCurrentQuestion] = useState(initialState);
   const [dropDown, setDropDown] = useState(false);
   const [difficultyDropDown, setDifficultyDropDown] = useState(false);
   const [sectionDropDown, setSectionDropDown] = useState(false);
   const [selectedSection, setSelectedSection] = useState(null);
-  const [sectionDuration, setSectionDuration] = useState({ hours: 0, minutes: 0 });
-  const [editingDuration, setEditingDuration] = useState(false);
-  const [newDuration, setNewDuration] = useState({ hours: 0, minutes: 0 });
+  const [sectionDetails, setSectionDetails] = useState({
+    duration: { hours: 0, minutes: 0 },
+    difficulty: "",
+    tags: "",
+    description: "",
+  });
 
   const handleChoiceSelect = (index, value) => {
     setDropDown(false);
@@ -36,7 +27,6 @@ const ELA = ({ data, closeTest, addTest }) => {
     newChoices[index] = value;
     setCurrentQuestion({ ...currentQuestion, choices: newChoices });
   };
-
 const handleNext = () => {
     console.log("Current Question before adding:", currentQuestion);
 
@@ -83,7 +73,34 @@ const handleNext = () => {
     }
 };
 
+const handleUpdateDuration = async () => {
+    if (!selectedSection) {
+      console.error("Section is not selected");
+      return;
+    }
 
+    const payload = {
+      duration: sectionDetails.duration,
+      difficulty: sectionDetails.difficulty,
+      tags: sectionDetails.tags,
+      description: sectionDetails.description,
+    };
+
+    try {
+      const response = await axios.put(
+        `https://csuite-production.up.railway.app/api/question/66bd7906cf73babea075022a/sections/${selectedSection}/details`,
+        payload
+      );
+
+      if (response.status === 200) {
+        fetchSectionDetails(selectedSection); // Refresh section details
+      } else {
+        console.error("Failed to update the section details. Server responded with:", response.status);
+      }
+    } catch (error) {
+      console.error("Error updating section details:", error.message);
+    }
+  };
 
 const handleAddTest = async () => {
     if (!selectedSection) {
