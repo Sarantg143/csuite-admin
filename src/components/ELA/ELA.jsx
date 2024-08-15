@@ -446,8 +446,7 @@ const ELA = ({ data, addTest, closeTest }) => {
   </div>
 </div>
 
-  );
-};
+ 
   
 export default ELA;
 
