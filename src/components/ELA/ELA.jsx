@@ -48,21 +48,22 @@ const ELA = ({ data, addTest, closeTest }) => {
   };
 
   const handleNext = () => {
-    console.log("Current Question before adding:", currentQuestion);
+  console.log("Current Question before adding:", currentQuestion);
 
-    if (questionValidation()) {
-      setCurrentTest((prev) => {
-        const updatedTest = [...prev, currentQuestion];
-        console.log("Updated Test after adding question:", updatedTest);
-        return updatedTest;
-      });
+  if (questionValidation()) {
+    setCurrentTest((prev) => {
+      const updatedTest = [...prev, currentQuestion];
+      console.log("Updated Test after adding question:", updatedTest);
+      return updatedTest;
+    });
 
-      // Reset currentQuestion after adding to the currentTest
-      setCurrentQuestion(initialState);
-    } else {
-      console.warn("Current question is not valid. Check question, choices, and answer.");
-    }
-  };
+    // Reset currentQuestion after adding to the currentTest
+    setCurrentQuestion(initialState);
+  } else {
+    console.warn("Current question is not valid. Check question, choices, and answer.");
+  }
+};
+
 
   const checkQuestionMatch = (index) => {
     if (currentTest?.indexOf(currentQuestion) === index) return "#8949ff";
@@ -121,41 +122,42 @@ const ELA = ({ data, addTest, closeTest }) => {
   };
 
   const handleAddTest = async () => {
-    if (!selectedSection) {
-      console.error("Section is not selected");
-      return;
+  if (!selectedSection) {
+    console.error("Section is not selected");
+    return;
+  }
+
+  if (currentTest.length === 0) {
+    console.error("No questions to add.");
+    return;
+  }
+
+  const payload = currentTest.map((q) => ({
+    question: q.question || "",
+    options: q.choices || [],
+    answer: q.answer?.value || "",
+  }));
+
+  console.log("Request payload:", payload);
+
+  try {
+    const response = await axios.put(
+      `https://csuite-production.up.railway.app/api/question/66bd7906cf73babea075022a/sections/${selectedSection}/questions`,
+      payload
+    );
+
+    console.log("Response:", response);
+
+    if (response.status === 200) {
+      addTest(currentTest);
+      closeTest();
+    } else {
+      console.error("Failed to save the test. Server responded with:", response.status);
     }
-
-    if (currentTest.length === 0) {
-      console.error("No questions to add.");
-      return;
-    }
-    const payload = currentTest.map((q) => ({
-      question: q.question || "",
-      options: q.choices || [],
-      answer: q.answer?.value || "",
-    }));
-
-    console.log("Request payload:", payload);
-
-    try {
-      const response = await axios.put(
-        `https://csuite-production.up.railway.app/api/question/66bd7906cf73babea075022a/sections/${selectedSection}/questions`,
-        payload
-      );
-
-      console.log("Response:", response);
-
-      if (response.status === 200) {
-        addTest(currentTest);
-        closeTest();
-      } else {
-        console.error("Failed to save the test. Server responded with:", response.status);
-      }
-    } catch (error) {
-      console.error("Error saving test:", error.message);
-    }
-  };
+  } catch (error) {
+    console.error("Error saving test:", error.message);
+  }
+};
 
   return (
     <div className="ela-test-page">
